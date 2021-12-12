@@ -1,8 +1,10 @@
 package render
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -12,20 +14,29 @@ var functions = template.FuncMap{}
 // RenderTemplate renders templates using html/template
 func RenderTamplate(w http.ResponseWriter, tmpl string) {
 
-	_, err := RenderTemplateTest(w)
+	tc, err := CreateTemplateCache()
 	if err != nil {
-		fmt.Println("Error getting template cache:", err)
+		// stop the application at this point because we can't get a template cache and we can't show any pages.
+		log.Fatal(err)
 	}
 
-	parsedTemplate, _ := template.ParseFiles("./templates/" + tmpl)
-	err = parsedTemplate.Execute(w, nil)
+	// ok: whether tmpl exists in tc keys.
+	t, ok := tc[tmpl]
+	if !ok {
+		log.Fatal(err)
+	}
+
+	buf := new(bytes.Buffer) // hold information
+	_ = t.Execute(buf, nil)  // store the value in buf
+
+	_, err = buf.WriteTo(w)
 	if err != nil {
-		fmt.Println("Error parsing template:", err)
-		return
+		fmt.Println("Error writing template to brawser")
 	}
 }
 
-func RenderTemplateTest(w http.ResponseWriter) (map[string]*template.Template, error) {
+// CreateTemplateCache creates a template cache as a template
+func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
 	pages, err := filepath.Glob("./templates/*.page.tmpl")
