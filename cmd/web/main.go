@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"myapp/pkg/handlers"
 	"net/http"
 )
 
@@ -10,8 +11,8 @@ const portNumber = ":8080"
 
 // main is the main application function
 func main() {
-	http.HandleFunc("/", Home)
-	http.HandleFunc("/about", About)
+	http.HandleFunc("/", handlers.Home)
+	http.HandleFunc("/about", handlers.About)
 	// http.HandleFunc("/divide", Divide)
 
 	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
@@ -21,3 +22,5 @@ func main() {
 	_ = http.ListenAndServe(portNumber, nil)
 	// access localhost:8080 in browser
 }
+
+// go run cmd/web/*.go
