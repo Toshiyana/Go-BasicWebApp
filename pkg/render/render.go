@@ -5,31 +5,42 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"myapp/pkg/config"
 	"net/http"
 	"path/filepath"
 )
 
 var functions = template.FuncMap{}
 
+var app *config.AppConfig
+
+// NewTemplates set the config for the template package
+func NewTemplates(a *config.AppConfig) {
+	app = a
+}
+
 // RenderTemplate renders templates using html/template
 func RenderTamplate(w http.ResponseWriter, tmpl string) {
 
-	tc, err := CreateTemplateCache()
-	if err != nil {
-		// stop the application at this point because we can't get a template cache and we can't show any pages.
-		log.Fatal(err)
+	var tc map[string]*template.Template
+
+	if app.UseCache {
+		// get the template cache from the app config
+		tc = app.TemplateCache
+	} else {
+		tc, _ = CreateTemplateCache()
 	}
 
 	// ok: whether tmpl exists in tc keys.
 	t, ok := tc[tmpl]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("Could not get template from template cache")
 	}
 
 	buf := new(bytes.Buffer) // hold information
 	_ = t.Execute(buf, nil)  // store the value in buf
 
-	_, err = buf.WriteTo(w)
+	_, err := buf.WriteTo(w)
 	if err != nil {
 		fmt.Println("Error writing template to brawser")
 	}
@@ -37,6 +48,11 @@ func RenderTamplate(w http.ResponseWriter, tmpl string) {
 
 // CreateTemplateCache creates a template cache as a template
 func CreateTemplateCache() (map[string]*template.Template, error) {
+
+	// get the template cache from the app config
+
+	// create the template cache only one time
+
 	myCache := map[string]*template.Template{}
 
 	pages, err := filepath.Glob("./templates/*.page.tmpl")

@@ -3,17 +3,39 @@ package handlers
 import (
 	"net/http"
 
+	"myapp/pkg/config"
 	"myapp/pkg/render"
 )
 
+// Repo is the repository used by the handlers
+var Repo *Repository
+
+// Repository is the repository type
+type Repository struct {
+	App *config.AppConfig
+}
+
+// NewRepo creates a new repository
+func NewRepo(a *config.AppConfig) *Repository {
+	return &Repository{
+		App: a,
+	}
+}
+
+// NewHanlders set the repository for the handlers
+func NewHandlers(r *Repository) {
+	Repo = r
+}
+
+// All of the handlers access to the repository using receivers(m *Repository)
 // Home is the home page handler
-func Home(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	render.RenderTamplate(w, "home.page.tmpl")
 	// fmt.Fprintf(w, "This is the home page")
 }
 
 // About is the about page handler
-func About(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	render.RenderTamplate(w, "about.page.tmpl")
 
 	// sum := addValues(2, 2)
