@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"myapp/pkg/config"
+	"myapp/pkg/models"
 	"myapp/pkg/render"
 )
 
@@ -30,13 +31,20 @@ func NewHandlers(r *Repository) {
 // All of the handlers access to the repository using receivers(m *Repository)
 // Home is the home page handler
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	render.RenderTamplate(w, "home.page.tmpl")
+	render.RenderTamplate(w, "home.page.tmpl", &models.TemplateData{})
 	// fmt.Fprintf(w, "This is the home page")
 }
 
 // About is the about page handler
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-	render.RenderTamplate(w, "about.page.tmpl")
+	// perform some logic
+	stringMap := make(map[string]string)
+	stringMap["test"] = "Hello, world."
+
+	// send the data to the template
+	render.RenderTamplate(w, "about.page.tmpl", &models.TemplateData{
+		StringMap: stringMap,
+	})
 
 	// sum := addValues(2, 2)
 	// _, _ = fmt.Fprintf(w, fmt.Sprintf("This is the about page and 2 + 2 is %d", sum))
