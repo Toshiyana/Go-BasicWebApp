@@ -31,16 +31,25 @@ func main() {
 
 	render.NewTemplates(&app)
 
-	http.HandleFunc("/", handlers.Repo.Home)
-	http.HandleFunc("/about", handlers.Repo.About)
-	// http.HandleFunc("/divide", Divide)
-
 	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
+
+	// Use routes
+	srv := &http.Server{
+		Addr:    portNumber,
+		Handler: routes(&app),
+	}
+
+	err = srv.ListenAndServe()
+	log.Fatal(err)
+
+	// http.HandleFunc("/", handlers.Repo.Home)
+	// http.HandleFunc("/about", handlers.Repo.About)
+	// http.HandleFunc("/divide", Divide)
 
 	// start web server that listens for requests
 	// listen to particular port of my computer (In this case, listen on 8080)
-	_ = http.ListenAndServe(portNumber, nil)
+	// _ = http.ListenAndServe(portNumber, nil)
 	// access localhost:8080 in browser
 }
 
-// go run cmd/web/*.go
+// command in terminal: go run cmd/web/*.go
