@@ -16,6 +16,8 @@ func routes(app *config.AppConfig) http.Handler {
 	// Middleware allows you to process a request as it comes into your Web application
 	// and perform some action on it.
 	mux.Use(middleware.Recoverer)
+	mux.Use(NoSurf)
+	// mux.Use(WriteToConsole)
 
 	mux.Get("/", http.HandlerFunc(handlers.Repo.Home))
 	mux.Get("/about", http.HandlerFunc(handlers.Repo.About))
